@@ -60,3 +60,27 @@ def test_classificar_planilha_prefixo_nao_mapeado(tmp_path):
 
     resultado = pd.read_excel(saida)
     assert list(resultado["Operadora"]) == ["Não identificado"]
+
+
+def test_classificar_planilha_entrada_csv_ponto_e_virgula_saida_csv(tmp_path):
+    entrada = tmp_path / "entrada.csv"
+    saida = tmp_path / "saida.csv"
+    tabela_csv = tmp_path / "tabela.csv"
+    tabela_csv.write_text(
+        "ddd,operadora,prefixo_inicio,prefixo_fim\n"
+        "67,Claro,99700,99799\n",
+        encoding="utf-8",
+    )
+    entrada.write_text(
+        "Name;Phone 1 - Value;Group Membership\n"
+        "Contato 1;5567997123456;TempOperadora\n",
+        encoding="utf-8",
+    )
+
+    classificar(str(entrada), "Phone 1 - Value", str(tabela_csv), str(saida))
+
+    resultado = pd.read_csv(saida)
+    assert list(resultado["Operadora"]) == ["Claro"]
+    # não deve alterar o arquivo de entrada
+    entrada_relida = pd.read_csv(str(entrada), sep=";")
+    assert "Operadora" not in entrada_relida.columns

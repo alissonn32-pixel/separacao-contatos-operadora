@@ -7,11 +7,24 @@ import pandas as pd
 from operadora import carregar_tabela, identificar_operadora, normalizar_numero
 
 
+def _ler_planilha(caminho: str) -> pd.DataFrame:
+    if caminho.lower().endswith(".csv"):
+        return pd.read_csv(caminho, sep=None, engine="python")
+    return pd.read_excel(caminho)
+
+
+def _salvar_planilha(df: pd.DataFrame, caminho: str) -> None:
+    if caminho.lower().endswith(".csv"):
+        df.to_csv(caminho, index=False)
+    else:
+        df.to_excel(caminho, index=False)
+
+
 def classificar(
     caminho_entrada: str, coluna_telefone: str, caminho_tabela: str, caminho_saida: str
 ) -> None:
     tabela = carregar_tabela(caminho_tabela)
-    df = pd.read_excel(caminho_entrada)
+    df = _ler_planilha(caminho_entrada)
 
     def classificar_linha(valor: object) -> str:
         if pd.isna(valor):
@@ -23,7 +36,7 @@ def classificar(
         return identificar_operadora(ddd, assinante, tabela)
 
     df["Operadora"] = df[coluna_telefone].apply(classificar_linha)
-    df.to_excel(caminho_saida, index=False)
+    _salvar_planilha(df, caminho_saida)
 
 
 if __name__ == "__main__":
