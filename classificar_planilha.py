@@ -15,7 +15,10 @@ def _ler_planilha(caminho: str) -> pd.DataFrame:
 
 def _salvar_planilha(df: pd.DataFrame, caminho: str) -> None:
     if caminho.lower().endswith(".csv"):
-        df.to_csv(caminho, index=False)
+        # ; e utf-8-sig: o Excel em português abre corretamente com duplo clique
+        # (vírgula é o separador decimal no Brasil, então "," não funciona como
+        # separador de coluna).
+        df.to_csv(caminho, index=False, sep=";", encoding="utf-8-sig")
     else:
         df.to_excel(caminho, index=False)
 

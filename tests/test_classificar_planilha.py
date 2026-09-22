@@ -79,7 +79,8 @@ def test_classificar_planilha_entrada_csv_ponto_e_virgula_saida_csv(tmp_path):
 
     classificar(str(entrada), "Phone 1 - Value", str(tabela_csv), str(saida))
 
-    resultado = pd.read_csv(saida)
+    # saída em CSV usa ; e utf-8-sig, para abrir certo no Excel em português
+    resultado = pd.read_csv(saida, sep=";", encoding="utf-8-sig")
     assert list(resultado["Operadora"]) == ["Claro"]
     # não deve alterar o arquivo de entrada
     entrada_relida = pd.read_csv(str(entrada), sep=";")
